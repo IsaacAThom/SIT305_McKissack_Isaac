@@ -21,4 +21,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
+
+    // Next step - copy over the core spinner logic to this document, and use toasts to test that
+    // the correct information is coming through (spinner position (ideally name/id but we'll
+    // settle), captured text value)
+
+    // then implement a Switch that handles the calculation logic - it will check for what the
+    // second spinner provides, spit up a toast for 'lol no' if its an incompatible unit type,
+    // and then push the calculated numbers to the result text field :)
 }

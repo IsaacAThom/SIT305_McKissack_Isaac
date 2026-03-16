@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="conversion_array">
+        <item name="usd">USD</item>
+        <item name="aud">AUD</item>
+        <item name="eur">EUR</item>
+        <item name="jpy">JPY</item>
+        <item name="gbp">GBP</item>
+        <item name="mpg">Miles per Gallon (mpg)</item>
+        <item name="kml">Kilometers per Liter (km/L)</item>
+        <item name="gal">Gallon (US)</item>
+        <item name="lit">Liters</item>
+        <item name="nam">Nautical Mile</item>
+        <item name="km">Kilometers</item>
+        <item name="cel">Celsius</item>
+        <item name="fah">Fahrenheit</item>
+        <item name="kel">Kelvin</item>
+    </string-array>
+</resources>
