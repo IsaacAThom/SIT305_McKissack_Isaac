@@ -118,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     break;
                 }
 
-                //may need to *bound* these fucking results but it works for the hot minute
                 destValue.setText(numberFormat.format(result));
 
                 break;
