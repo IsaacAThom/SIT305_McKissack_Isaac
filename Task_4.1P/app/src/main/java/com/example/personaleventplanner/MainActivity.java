@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showEventList() {
-        showNewFragmentInMainFragmentContainerView(new EventListFragment());
+        showNewFragmentInMainFragmentContainerView(new EventDisplayFragment());
     }
 
     public void showAddEvent() {
