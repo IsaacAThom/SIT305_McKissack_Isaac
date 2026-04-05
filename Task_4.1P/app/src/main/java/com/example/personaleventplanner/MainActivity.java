@@ -7,6 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,5 +23,27 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    public void showEventList() {
+        showNewFragmentInMainFragmentContainerView(new EventListFragment());
+    }
+
+    public void showAddEvent() {
+        showNewFragmentInMainFragmentContainerView(new AddEventFragment());
+    }
+
+    // Pushes Fragments into the main display, and adds them to the backstack appropriately
+    private void showNewFragmentInMainFragmentContainerView(Fragment newFragmentInstance) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Remove + add new fragment
+        fragmentTransaction.replace(R.id.mainFragmentContainerView, newFragmentInstance);
+        // Adds previous fragment to backStack
+        fragmentTransaction.addToBackStack(null);
+        // Commit
+        fragmentTransaction.commit();
     }
 }
