@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">Personal Event Planner</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_event">Add Event</string>
+    <string name="event_list">Event List</string>
+    <string name="event_title">Event Title</string>
+    <string name="event_date">Event Date</string>
+    <string name="event_location">Event Location</string>
+    <string name="event_category">Event Category</string>
 </resources>

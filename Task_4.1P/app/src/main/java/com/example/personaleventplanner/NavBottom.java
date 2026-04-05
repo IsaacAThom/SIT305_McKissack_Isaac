@@ -1,13 +1,12 @@
 package com.example.personaleventplanner;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.fragment.app.Fragment;
 
 public class NavBottom extends Fragment {
 
@@ -31,19 +30,9 @@ public class NavBottom extends Fragment {
         Button addEventButton = thisFragmentView.findViewById(R.id.goToAddListButton);
 
         // If eventListButton clicked, show EventListFragment
-        eventListButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainActivity.showEventList();
-            }
-        });
+        eventListButton.setOnClickListener(view -> mainActivity.showEventList());
 
-        addEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainActivity.showAddEvent();
-            }
-        });
+        addEventButton.setOnClickListener(view -> mainActivity.showAddEvent());
 
 
         return thisFragmentView;
