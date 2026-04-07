@@ -21,4 +21,6 @@ public class EventEntity {
 
     public String eventCategory;
 
+
+
 }

@@ -31,6 +31,7 @@ public class DatabaseTest {
         Context context = ApplicationProvider.getApplicationContext();
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();
         eventDao = db.eventDao();
+        //eventVM = new EventViewModel(this).get(EventViewModel.class);
     }
 
     @After
@@ -96,7 +97,14 @@ public class DatabaseTest {
         event2.eventDate = Calendar.getInstance();
         event2.eventLocation = "Canterbury";
         event2.eventCategory = "Leisure";
-        eventVM.insert(event);
+        if(event == null) {
+            System.out.println("piss off");
+        } else if (eventVM == null) {
+            System.out.println("OHH MY GOD");
+        } else {
+            eventVM.insert(event);
+        }
+
         eventVM.insert(event2);
         System.out.println(eventVM.getAllEvents().getValue());
 
