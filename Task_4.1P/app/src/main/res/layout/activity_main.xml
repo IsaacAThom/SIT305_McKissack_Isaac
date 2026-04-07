@@ -7,6 +7,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- Recycler View Test -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/event_list_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/child_event"
+        android:background="#FF0000"/>
+
     <!-- Contains Core Application Fragment/s - Defaults to Event List -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/mainFragmentContainerView"
