@@ -23,6 +23,7 @@ public class EventDisplayFragment extends Fragment {
     }
 
     private WordViewModel wordViewModel;
+    private EventViewModel eventViewModel;
 
     RecyclerView recyclerView;
 
@@ -31,6 +32,8 @@ public class EventDisplayFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_event_display, container, false);
+
+        /*
 
         wordViewModel = new ViewModelProvider(this).get(WordViewModel.class);
 
@@ -43,6 +46,21 @@ public class EventDisplayFragment extends Fragment {
             // Update the cached copy of the words in the adapter.
             adapter.submitList(words);
         });
+
+         */
+
+        eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
+
+        recyclerView = rootView.findViewById(R.id.event_list_recycler);
+        final EventListAdapter adapter = new EventListAdapter(new EventListAdapter.EventDiff());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        eventViewModel.getAllEvents().observe(this, events -> {
+            // Update the cached copy of the words in the adapter.
+            adapter.submitList(events);
+        });
+
 
         return rootView;
     }

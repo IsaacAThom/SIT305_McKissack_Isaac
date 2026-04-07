@@ -25,10 +25,10 @@ public class AddEventFragment extends Fragment {
         // Required empty public constructor
     }
 
-    private WordViewModel eventViewModel;
+    private EventViewModel eventViewModel;
 
     private WordDao eventDao;
-    Word newEvent;
+    EventEntity newEvent;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,7 +37,7 @@ public class AddEventFragment extends Fragment {
         View thisFragmentView = inflater.inflate(R.layout.fragment_add_event, container, false);
 
         // EventViewModel IN!!!
-        eventViewModel = new ViewModelProvider(this).get(WordViewModel.class);
+        eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
 
         // Date management
         DatePicker datePicker = thisFragmentView.findViewById(R.id.edit_event_date);
@@ -76,32 +76,25 @@ public class AddEventFragment extends Fragment {
                             Toast.LENGTH_LONG).show();
                 }
                 else {
+                    // Retrieve all data from form
+                    String eventTitle = String.valueOf(editEventTitle.getText());
+                    // Calendar Set Up
+                    int day = datePicker.getDayOfMonth();
+                    int month = datePicker.getMonth();
+                    int year = datePicker.getYear();
+                    Calendar eventDate = Calendar.getInstance();
+                    eventDate.set(year, month, day);
+                    String eventLocation = String.valueOf(editEventLocation.getText());
+                    String eventCategory = String.valueOf(editEventCategory.getText());
 
-                    Toast.makeText(thisFragmentView.getContext(), editEventTitle.getText(),
-                            Toast.LENGTH_SHORT).show();
+                    newEvent = new EventEntity(eventTitle, eventDate, eventLocation, eventCategory);
 
-                    Word word = new Word(editEventTitle.getText().toString());
+                    // Debug text
+                    Toast.makeText(thisFragmentView.getContext(),
+                            newEvent.eventTitle + " " + newEvent.eventLocation + " " + newEvent.eventCategory + " " + datePicker.getDayOfMonth() + " " + datePicker.getMonth() + " " + datePicker.getYear() + " " + newEvent.eventDate,
+                            Toast.LENGTH_LONG).show();
 
-                    eventViewModel.insert(word);
-//                    // Insert all data into the entity
-//                    newEvent = new EventEntity();
-//                    newEvent.eventTitle = String.valueOf(editEventTitle.getText());
-//                    // Calendar Set Up
-//                    int day = datePicker.getDayOfMonth();
-//                    int month = datePicker.getMonth();
-//                    int year = datePicker.getYear();
-//                    Calendar calendar = Calendar.getInstance();
-//                    calendar.set(year, month, day);
-//                    newEvent.eventDate = calendar;
-//                    newEvent.eventLocation = String.valueOf(editEventLocation.getText());
-//                    newEvent.eventCategory = String.valueOf(editEventCategory.getText());
-//
-//                    // Debug text
-//                    Toast.makeText(thisFragmentView.getContext(),
-//                            newEvent.eventTitle + " " + newEvent.eventLocation + " " + newEvent.eventCategory,
-//                            Toast.LENGTH_LONG).show();
-//
-//                    eventViewModel.insert(newEvent);
+                    eventViewModel.insert(newEvent);
                 }
             }
         });
