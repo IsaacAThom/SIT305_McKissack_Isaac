@@ -30,7 +30,7 @@ public abstract class EventRoomDatabase extends RoomDatabase {
             synchronized (WordRoomDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            EventRoomDatabase.class, "event_database").addCallback(sRoomDatabaseCallback).build();
+                            EventRoomDatabase.class, "event_database").addCallback(sRoomDatabaseCallback).allowMainThreadQueries().build();
                 }
             }
         }
@@ -50,9 +50,9 @@ public abstract class EventRoomDatabase extends RoomDatabase {
                 EventDao dao = INSTANCE.eventDao();
                 dao.deleteAll();
 
-                EventEntity event = new EventEntity("Event Title", Calendar.getInstance(), "The " +
-                        "Park", "Important");
-                dao.insert(event);
+//                EventEntity event = new EventEntity("Event Title", Calendar.getInstance(), "The " +
+//                        "Park", "Important");
+//                dao.insert(event);
             });
         }
     };

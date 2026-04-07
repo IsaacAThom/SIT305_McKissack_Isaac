@@ -7,9 +7,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,7 +63,6 @@ public class EventDisplayFragment extends Fragment {
             // Update the cached copy of the words in the adapter.
             adapter.submitList(events);
         });
-
 
         return rootView;
     }

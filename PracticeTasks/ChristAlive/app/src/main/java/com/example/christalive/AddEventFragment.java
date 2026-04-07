@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,7 @@ public class AddEventFragment extends Fragment {
 
     private EventViewModel eventViewModel;
 
-    private WordDao eventDao;
+    private EventDao eventDao;
     EventEntity newEvent;
 
     @Override
@@ -45,6 +46,9 @@ public class AddEventFragment extends Fragment {
         // Initialise today's date
         Calendar today = Calendar.getInstance();
 
+        // Collecting user input for Date here - initialise as today as well.
+        Calendar eventDate = Calendar.getInstance();
+
         // Initialize DatePicker with the current date
         datePicker.init(
                 today.get(Calendar.YEAR),
@@ -55,8 +59,11 @@ public class AddEventFragment extends Fragment {
                     @Override
                     public void onDateChanged(DatePicker view, int year, int month, int day) {
                         // Display selected date in Toast message
-                        String msg = "You Selected: " + day + "/" + (month + 1) + "/" + year;
-                        Toast.makeText(thisFragmentView.getContext(), msg, Toast.LENGTH_SHORT).show();
+//                        String msg = "You Selected: " + day + "/" + (month + 1) + "/" + year;
+//                        Toast.makeText(thisFragmentView.getContext(), msg, Toast.LENGTH_SHORT).show();
+                        // Update eventDate
+                        eventDate.set(year, month, day);
+
                     }
                 }
         );
@@ -78,21 +85,20 @@ public class AddEventFragment extends Fragment {
                 else {
                     // Retrieve all data from form
                     String eventTitle = String.valueOf(editEventTitle.getText());
-                    // Calendar Set Up
-                    int day = datePicker.getDayOfMonth();
-                    int month = datePicker.getMonth();
-                    int year = datePicker.getYear();
-                    Calendar eventDate = Calendar.getInstance();
-                    eventDate.set(year, month, day);
+//                    // Calendar Set Up
+//                    int day = datePicker.getDayOfMonth();
+//                    int month = datePicker.getMonth();
+//                    int year = datePicker.getYear();
+//                    eventDate.set(year, month, day);
                     String eventLocation = String.valueOf(editEventLocation.getText());
                     String eventCategory = String.valueOf(editEventCategory.getText());
 
-                    newEvent = new EventEntity(eventTitle, eventDate, eventLocation, eventCategory);
+                    // Convert from Calendar to Date for storage
+                    Date setDate = eventDate.getTime();
 
-                    // Debug text
-                    Toast.makeText(thisFragmentView.getContext(),
-                            newEvent.eventTitle + " " + newEvent.eventLocation + " " + newEvent.eventCategory + " " + datePicker.getDayOfMonth() + " " + datePicker.getMonth() + " " + datePicker.getYear() + " " + newEvent.eventDate,
-                            Toast.LENGTH_LONG).show();
+                    newEvent = new EventEntity(eventTitle, setDate, eventLocation, eventCategory);
+
+                    Log.d("Add Event ", newEvent.eventDate.toString());
 
                     eventViewModel.insert(newEvent);
                 }

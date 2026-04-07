@@ -15,15 +15,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/recyclerview_item"/>
-
-    <Button
-        android:id="@+id/test_button_bravo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/event_list_recycler"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="im testing something hold on"/>
+        tools:listitem="@layout/event_item"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

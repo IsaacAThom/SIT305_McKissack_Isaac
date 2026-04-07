@@ -4,16 +4,17 @@ import androidx.room.TypeConverter;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
-// For the purpose of converting Calendars into a usable format by Room (whyyyyy)
+// Converts Dates into Longs for storage in Room, and back again
 public class Converters {
     @TypeConverter
-    public static Calendar fromTimestamp(Long value) {
-        return value == null ? null : Calendar.getInstance();
+    public static Date fromTimestamp(Long value) {
+        return value == null ? null : new Date(value);
     }
 
     @TypeConverter
-    public static Long calendarToTimestamp(Calendar calendar) {
-        return calendar == null ? null : Calendar.getInstance().getTimeInMillis();
+    public static Long dateToTimestamp(Date date) {
+        return date == null ? null : date.getTime();
     }
 }

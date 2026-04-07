@@ -5,6 +5,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.util.Calendar;
+import java.util.Date;
 
 //Entity storing the information of each event
 
@@ -15,13 +16,13 @@ public class EventEntity {
 
     public String eventTitle;
 
-    public Calendar eventDate;
-
+    public Date eventDate;
     public String eventLocation;
 
     public String eventCategory;
 
-    public EventEntity(@NonNull String eventTitle, @NonNull Calendar eventDate, @NonNull String eventLocation,
+    public EventEntity(@NonNull String eventTitle, @NonNull Date eventDate,
+                       @NonNull String eventLocation,
                        @NonNull String eventCategory) {
         this.eventTitle = eventTitle;
         this.eventDate = eventDate;
