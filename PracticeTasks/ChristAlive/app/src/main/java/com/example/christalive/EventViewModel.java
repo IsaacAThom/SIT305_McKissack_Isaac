@@ -18,7 +18,7 @@ public class EventViewModel extends AndroidViewModel {
     public EventViewModel (Application application) {
         super(application);
         eventRepository = new EventRepository(application);
-        allEvents = eventRepository.getAllWords();
+        allEvents = eventRepository.getAllEvents();
     }
 
     LiveData<List<EventEntity>> getAllEvents() { return allEvents; }

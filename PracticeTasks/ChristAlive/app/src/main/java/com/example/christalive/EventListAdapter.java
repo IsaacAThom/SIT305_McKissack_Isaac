@@ -20,7 +20,8 @@ public class EventListAdapter extends ListAdapter<EventEntity, EventViewHolder> 
     @Override
     public void onBindViewHolder(EventViewHolder holder, int position) {
         EventEntity current = getItem(position);
-        holder.bind(current.eventTitle, current.eventDate, current.eventLocation, current.eventCategory);
+//        holder.bind(current.eventTitle, current.eventDate, current.eventLocation, current.eventCategory);
+        holder.bind(current);
     }
 
     static class EventDiff extends DiffUtil.ItemCallback<EventEntity> {

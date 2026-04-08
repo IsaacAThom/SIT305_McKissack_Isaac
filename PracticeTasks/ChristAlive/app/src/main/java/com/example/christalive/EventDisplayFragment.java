@@ -25,7 +25,6 @@ public class EventDisplayFragment extends Fragment {
         // Required empty public constructor
     }
 
-    private WordViewModel wordViewModel;
     private EventViewModel eventViewModel;
 
     RecyclerView recyclerView;

@@ -2,6 +2,7 @@ package com.example.christalive;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -20,7 +21,6 @@ public interface EventDao {
 
     @Query("DELETE FROM event_table WHERE uid = :id")
     void deleteEvent(int id);
-
 
     @Query("SELECT * FROM event_table ORDER BY eventDate ASC")
     LiveData<List<EventEntity>> getOrderedEvents();

@@ -19,7 +19,7 @@ public class EventRepository {
         allEvents = eventDao.getOrderedEvents();
     }
 
-    LiveData<List<EventEntity>> getAllWords() {
+    LiveData<List<EventEntity>> getAllEvents() {
         return allEvents;
     }
 

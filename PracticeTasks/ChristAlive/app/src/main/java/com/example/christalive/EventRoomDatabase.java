@@ -27,7 +27,7 @@ public abstract class EventRoomDatabase extends RoomDatabase {
 
     static EventRoomDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
-            synchronized (WordRoomDatabase.class) {
+            synchronized (EventRoomDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             EventRoomDatabase.class, "event_database").addCallback(sRoomDatabaseCallback).allowMainThreadQueries().build();
