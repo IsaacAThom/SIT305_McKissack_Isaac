@@ -57,7 +57,6 @@ class EventViewHolder extends RecyclerView.ViewHolder implements RecyclerViewInt
             @Override
             public void onClick(View v) {
                 // Delete Event
-                Log.d("Holder", "Delete Event " + eventEntity.uid);
                 deleteEventOnClick(eventEntity.uid);
             }
         });
@@ -65,7 +64,6 @@ class EventViewHolder extends RecyclerView.ViewHolder implements RecyclerViewInt
             @Override
             public void onClick(View v) {
                 // Edit Event
-                Log.d("Holder", "Edit Event" + eventEntity.uid);
                 editEventOnClick(eventEntity.uid);
             }
         });
