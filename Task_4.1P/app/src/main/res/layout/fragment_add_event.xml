@@ -5,21 +5,22 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddEventFragment"
-    android:background="#F2E3E3">
+    tools:context=".AddEventFragment">
 
     <TextView
         android:id="@+id/ae_page_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center_horizontal"
+        android:background="#AD3D8C"
+        android:text="@string/add_event_header"
+        android:textColor="@color/white"
         android:fontFamily="casual"
-        android:text="ADD EVENT"
         android:textSize="30sp"
-        android:layout_margin="20sp"/>
+        android:gravity="center"
+        android:padding="10dp"
+        />
 
     <TextView
         android:id="@+id/ae_event_title"
@@ -30,7 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center_horizontal"
         android:fontFamily="serif"
-        android:text="Add Event Title"
+        android:text="@string/add_event_title"
         android:textSize="20sp"
         android:layout_marginTop="20sp"
         android:labelFor="@id/edit_event_title"
@@ -58,7 +59,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center_horizontal"
         android:fontFamily="serif"
-        android:text="Pick Event Date"
+        android:text="@string/pick_event_date"
         android:textSize="20sp"
         android:layout_marginTop="20sp"
         android:labelFor="@id/edit_event_date"
@@ -83,7 +84,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center_horizontal"
         android:fontFamily="serif"
-        android:text="Add Event Location"
+        android:text="@string/add_event_location"
         android:textSize="20sp"
         android:layout_marginTop="20sp"
         android:labelFor="@id/edit_event_location"
@@ -110,7 +111,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center_horizontal"
         android:fontFamily="serif"
-        android:text="Add Event Category"
+        android:text="@string/add_event_category"
         android:textSize="20sp"
         android:layout_marginTop="20sp"
         android:labelFor="@id/edit_event_category"
@@ -133,7 +134,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="Save Event"
-        android:layout_margin="20dp"/>
+        android:text="@string/save_event"
+        android:layout_margin="20dp"
+        android:backgroundTint="#80117E"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

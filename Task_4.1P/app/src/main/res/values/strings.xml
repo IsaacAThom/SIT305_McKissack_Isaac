@@ -1,6 +1,20 @@
 <resources>
     <string name="app_name">PersonalEventPlanner</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="add_event_header">ADD EVENT</string>
+    <string name="add_event_title">Add Event Title</string>
+    <string name="pick_event_date">Pick Event Date</string>
+    <string name="add_event_location">Add Event Location</string>
+    <string name="add_event_category">Add Event Category</string>
+    <string name="save_event">Save Event</string>
+    <string name="edit_event_header">EDIT EVENT</string>
+    <string name="edit_event_title">Edit Event Title</string>
+    <string name="edit_event_date">Edit Event Date</string>
+    <string name="edit_event_location">Edit Event Location</string>
+    <string name="edit_event_category">Edit Event Category</string>
+    <string name="event_list_nav">Event List</string>
+    <string name="add_event_nav">Add Event</string>
+    <string name="event_list_header">EVENT LIST</string>
+
 </resources>

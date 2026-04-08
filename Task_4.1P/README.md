@@ -13,5 +13,10 @@ I have to acknowledge this [tutorial](developer.android.com/codelabs/android-roo
 alter to suit the needs of the project. There were innumerable others I referred to for 
 individual components, but this one was the most influential once I actually got it to work!
 
+This was originally a dummy project (following the above tutorial) prior to being made into the 
+final assessment - some artifacts of this might remain. If a more thorough github commit history 
+is needed, it can be found in PracticeTasks/ChristAlive (which is how you know it was a practice 
+project)
+
 This was a nightmare to make and I'm so sorry for how this is. I hope I haven't missed anything 
-major!
+major! Thank you!

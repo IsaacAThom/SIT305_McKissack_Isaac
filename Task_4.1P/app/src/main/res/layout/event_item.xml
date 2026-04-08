@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
     android:padding="10dp"
-    android:background="#1D2357">
+    android:background="#3D2256">
 
     <TextView
         android:id="@+id/tv_event_title"
@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center_horizontal"
-        android:fontFamily="serif"
+        android:fontFamily="casual"
         android:text="Event Title"
         android:textColor="@color/white"
         android:textSize="25sp"
