@@ -14,11 +14,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link EventDisplayFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class EventDisplayFragment extends Fragment {
 
     public EventDisplayFragment() {
@@ -35,22 +30,6 @@ public class EventDisplayFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_event_display, container, false);
 
-        /*
-
-        wordViewModel = new ViewModelProvider(this).get(WordViewModel.class);
-
-        recyclerView = rootView.findViewById(R.id.event_list_recycler);
-        final WordListAdapter adapter = new WordListAdapter(new WordListAdapter.WordDiff());
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        wordViewModel.getAllWords().observe(this, words -> {
-            // Update the cached copy of the words in the adapter.
-            adapter.submitList(words);
-        });
-
-         */
-
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
 
         recyclerView = rootView.findViewById(R.id.event_list_recycler);
@@ -58,7 +37,7 @@ public class EventDisplayFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        eventViewModel.getAllEvents().observe(this, events -> {
+        eventViewModel.getAllEvents().observe(getViewLifecycleOwner(), events -> {
             // Update the cached copy of the words in the adapter.
             adapter.submitList(events);
         });

@@ -19,20 +19,34 @@ public class EventRepository {
         allEvents = eventDao.getOrderedEvents();
     }
 
+    // Gets all events
     LiveData<List<EventEntity>> getAllEvents() {
         return allEvents;
     }
 
+    // Adds to database
     void insert(EventEntity event) {
         EventRoomDatabase.databaseWriteExecutor.execute(() -> {
             eventDao.insert(event);
-            Log.d("Repository ", event.eventDate.toString());
         });
     }
 
+    // Deletes event by id
     void deleteEvent(int id) {
         EventRoomDatabase.databaseWriteExecutor.execute(() -> {
             eventDao.deleteEvent(id);
+        });
+    }
+
+    // Fetching events for editing
+    EventEntity getEvent(int id) {
+        return eventDao.getEvent(id);
+    }
+
+    // Pushing update to edited event
+    void update(EventEntity event) {
+        EventRoomDatabase.databaseWriteExecutor.execute(() -> {
+            eventDao.update(event);
         });
     }
 }

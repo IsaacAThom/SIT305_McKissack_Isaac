@@ -25,10 +25,13 @@ public class EventViewModel extends AndroidViewModel {
 
     public void insert(EventEntity event) {
         eventRepository.insert(event);
-        Log.d("ViewModel ", event.eventDate.toString());
     }
 
-    public void deleteEvent(int id) {
-        eventRepository.deleteEvent(id);
+    public EventEntity getEvent(int id) {
+        return eventRepository.getEvent(id);
+    }
+
+    public void update(EventEntity event) {
+        eventRepository.update(event);
     }
 }

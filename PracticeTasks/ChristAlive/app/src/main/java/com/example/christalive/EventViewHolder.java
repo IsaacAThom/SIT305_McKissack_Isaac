@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,13 +18,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+// This one is a mess
 class EventViewHolder extends RecyclerView.ViewHolder implements RecyclerViewInterface {
     private final TextView eventTitleView, eventDateView, eventLocationView, eventCategoryView;
     private final ImageButton deleteEvent, editEvent;
 
     private EventRepository eventRepository;
 
-    private final LiveData<List<EventEntity>> allEvents;
+    private MainActivity mainActivity;
 
     // Format for displaying dates correctly for Users
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy MMM dd");
@@ -41,22 +43,21 @@ class EventViewHolder extends RecyclerView.ViewHolder implements RecyclerViewInt
         editEvent = itemView.findViewById(R.id.edit_event);
 
         eventRepository = new EventRepository(new Application());
-        allEvents = eventRepository.getAllEvents();
+
+        mainActivity = (MainActivity) itemView.getContext();
     }
 
-    // public void bind(String title, Date date, String location, String category) {
-
     public void bind(EventEntity eventEntity) {
+
         // Converting date input to something readable
         String dateString = sdf.format(eventEntity.eventDate.getTime());
 
+        // Pass all info from the event to the display
         eventTitleView.setText(eventEntity.eventTitle);
         eventDateView.setText(dateString);
         eventLocationView.setText(eventEntity.eventLocation);
         eventCategoryView.setText(eventEntity.eventCategory);
 
-        //OnClick Listeners - can I pass this info forward to somewhere it can recieve the data?
-        // Holder doesn't have access to entity data itself is the issue rn
         deleteEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,15 +82,16 @@ class EventViewHolder extends RecyclerView.ViewHolder implements RecyclerViewInt
         return new EventViewHolder(view);
     }
 
+    // OnClickListeners incorporating the methods from RecyclerViewInterface
     @Override
     public void deleteEventOnClick(int position) {
-        Log.d("Interface", "Delete Event " + position);
         eventRepository.deleteEvent(position);
+        Toast.makeText(itemView.getContext(), "Event Deleted",Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void editEventOnClick(int position) {
-        Log.d("Interface", "Edit Event " + position);
-
+        // Calling function from mainActivity to show Edit Page in main fragmentView
+        mainActivity.showEditEvent(position);
     }
 }

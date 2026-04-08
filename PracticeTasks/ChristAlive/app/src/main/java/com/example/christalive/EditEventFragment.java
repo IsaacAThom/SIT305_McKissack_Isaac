@@ -1,7 +1,5 @@
 package com.example.christalive;
 
-import android.content.Intent;
-import android.media.metrics.Event;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -20,15 +18,18 @@ import android.widget.Toast;
 import java.util.Calendar;
 import java.util.Date;
 
-public class AddEventFragment extends Fragment {
+public class EditEventFragment extends Fragment {
 
-    public AddEventFragment() {
-        // Required empty public constructor
-    }
+    int position;
 
     private EventViewModel eventViewModel;
+    private EventEntity eventEntity;
 
-    EventEntity newEvent;
+
+    public EditEventFragment(int position) {
+        // Required empty public constructor
+        this.position = position;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,31 +43,34 @@ public class AddEventFragment extends Fragment {
         // Date management
         DatePicker datePicker = thisFragmentView.findViewById(R.id.edit_event_date);
 
-        // Initialise today's date
+        // Today's date for data validation
         Calendar today = Calendar.getInstance();
 
-        // Collecting user input for Date here - initialise as today as well.
-        Calendar eventDate = Calendar.getInstance();
+        // Fetch data from the event to be updated
+        eventEntity = eventViewModel.getEvent(position);
 
-        // Initialize DatePicker with the current date
+        // Pass current data to the textviews
+        EditText editEventTitle = thisFragmentView.findViewById(R.id.edit_event_title);
+        editEventTitle.setText(eventEntity.eventTitle);
+        EditText editEventLocation = thisFragmentView.findViewById(R.id.edit_event_location);
+        editEventLocation.setText(eventEntity.eventLocation);
+        EditText editEventCategory = thisFragmentView.findViewById(R.id.edit_event_category);
+        editEventCategory.setText(eventEntity.eventCategory);
+            // Calendar separate because ough
+        Calendar editEventDate = Calendar.getInstance();
+        editEventDate.setTime(eventEntity.eventDate);
         datePicker.init(
-                today.get(Calendar.YEAR),
-                today.get(Calendar.MONTH),
-                today.get(Calendar.DAY_OF_MONTH),
+                editEventDate.get(Calendar.YEAR),
+                editEventDate.get(Calendar.MONTH),
+                editEventDate.get(Calendar.DAY_OF_MONTH),
                 new DatePicker.OnDateChangedListener() {
                     @Override
                     public void onDateChanged(DatePicker view, int year, int month, int day) {
                         // Update eventDate
-                        eventDate.set(year, month, day);
-
+                        editEventDate.set(year, month, day);
                     }
                 }
         );
-
-        // Other Data collected from the form
-        EditText editEventTitle = thisFragmentView.findViewById(R.id.edit_event_title);
-        EditText editEventLocation = thisFragmentView.findViewById(R.id.edit_event_location);
-        EditText editEventCategory = thisFragmentView.findViewById(R.id.edit_event_category);
 
         Button saveEvent = thisFragmentView.findViewById(R.id.save_event);
         saveEvent.setOnClickListener(new View.OnClickListener() {
@@ -76,8 +80,7 @@ public class AddEventFragment extends Fragment {
                 if (TextUtils.isEmpty(editEventTitle.getText()) || TextUtils.isEmpty(editEventLocation.getText()) || TextUtils.isEmpty(editEventCategory.getText())) {
                     Toast.makeText(thisFragmentView.getContext(), "Error: Event Not Complete",
                             Toast.LENGTH_LONG).show();
-                }
-                else if(eventDate.before(today)) {
+                } else if(editEventDate.before(today)) {
                     Toast.makeText(thisFragmentView.getContext(), "Error: Event Date is in the past",
                             Toast.LENGTH_LONG).show();
                 }
@@ -88,14 +91,19 @@ public class AddEventFragment extends Fragment {
                     String eventCategory = String.valueOf(editEventCategory.getText());
 
                     // Convert from Calendar to Date for storage
-                    Date setDate = eventDate.getTime();
+                    Date setDate = editEventDate.getTime();
 
-                    newEvent = new EventEntity(eventTitle, setDate, eventLocation, eventCategory);
+                    // Update event!
+                    eventEntity.eventTitle = eventTitle;
+                    eventEntity.eventDate = setDate;
+                    eventEntity.eventLocation = eventLocation;
+                    eventEntity.eventCategory = eventCategory;
 
-                    eventViewModel.insert(newEvent);
+                    eventViewModel.update(eventEntity);
 
-                    Toast.makeText(thisFragmentView.getContext(), "Event Added",
+                    Toast.makeText(thisFragmentView.getContext(), "Event Updated",
                             Toast.LENGTH_LONG).show();
+
                 }
             }
         });

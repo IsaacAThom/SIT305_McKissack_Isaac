@@ -34,6 +34,7 @@ public class NavBottom extends Fragment {
         eventListButton.setOnClickListener(
                 view -> mainActivity.showEventList());
 
+        // If addEvent button clicked, show AddEventFragment
         addEventButton.setOnClickListener(view -> mainActivity.showAddEvent());
 
         return thisFragmentView;

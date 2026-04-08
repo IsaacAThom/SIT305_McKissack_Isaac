@@ -25,6 +25,7 @@ public abstract class EventRoomDatabase extends RoomDatabase {
     static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
+    // "Debug" code allows main thread queries. Good enough! Small database, anyway.
     static EventRoomDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (EventRoomDatabase.class) {
@@ -37,23 +38,11 @@ public abstract class EventRoomDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
+    // Creates the database
     private static RoomDatabase.Callback sRoomDatabaseCallback = new RoomDatabase.Callback() {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-
-            // If you want to keep data through app restarts,
-            // comment out the following block
-            databaseWriteExecutor.execute(() -> {
-                // Populate the database in the background.
-                // If you want to start with more words, just add them.
-                EventDao dao = INSTANCE.eventDao();
-                dao.deleteAll();
-
-//                EventEntity event = new EventEntity("Event Title", Calendar.getInstance(), "The " +
-//                        "Park", "Important");
-//                dao.insert(event);
-            });
         }
     };
 }

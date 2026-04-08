@@ -3,14 +3,13 @@ package com.example.christalive;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
-import java.util.Calendar;
 import java.util.Date;
 
 //Entity storing the information of each event
 
 @Entity(tableName = "event_table")
 public class EventEntity {
+    // Primary Key - used to fetch entities from the database
     @PrimaryKey(autoGenerate = true)
     public int uid;
 
