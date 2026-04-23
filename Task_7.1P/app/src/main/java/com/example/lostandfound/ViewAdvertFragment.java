@@ -1,13 +1,17 @@
 package com.example.lostandfound;
 
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ViewAdvertFragment extends Fragment {
@@ -16,6 +20,8 @@ public class ViewAdvertFragment extends Fragment {
 
     private AdvertViewModel advertViewModel;
     private AdvertEntity advertEntity;
+
+    private MainActivity mainActivity;
 
     public ViewAdvertFragment(int position) {
         // Required empty public constructor
@@ -26,6 +32,8 @@ public class ViewAdvertFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View thisFragmentView = inflater.inflate(R.layout.fragment_view_advert, container, false);
+
+        mainActivity = (MainActivity) getActivity();
 
         advertViewModel = new ViewModelProvider(this).get(AdvertViewModel.class);
 
@@ -39,6 +47,22 @@ public class ViewAdvertFragment extends Fragment {
         advertLocation.setText(advertEntity.advertLocation);
         TextView advertDescription = thisFragmentView.findViewById(R.id.advert_description);
         advertDescription.setText(advertEntity.advertDescription);
+
+        ImageView advertImage = thisFragmentView.findViewById(R.id.advert_image);
+        advertImage.setImageURI(Uri.parse(advertEntity.advertImage));
+
+        Button removeAdvert = thisFragmentView.findViewById(R.id.remove_advert_button);
+        removeAdvert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                advertViewModel.deleteAdvert(advertEntity.uid);
+                // Clear the deleted advert from the backstack to avoid crashing
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                fm.popBackStack();
+                // New Lost/Found List Fragment
+                mainActivity.showLostAndFoundList();
+            }
+        });
 
         // Inflate the layout for this fragment
         return thisFragmentView;

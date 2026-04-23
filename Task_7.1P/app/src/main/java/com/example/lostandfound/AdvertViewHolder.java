@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 class AdvertViewHolder extends RecyclerView.ViewHolder implements RecyclerViewInterface {
 
     private final TextView advertTitleView, advertDateView;
-    private final Button openAdvert;
+    private final Button openAdvert, deleteAdvert;
 
     private AdvertRepository advertRepository;
 
@@ -30,6 +30,7 @@ class AdvertViewHolder extends RecyclerView.ViewHolder implements RecyclerViewIn
         advertDateView = itemView.findViewById(R.id.advert_date);
 
         openAdvert = itemView.findViewById(R.id.open_advert_button);
+        deleteAdvert = itemView.findViewById(R.id.remove_advert_button);
 
         advertRepository = new AdvertRepository(new Application());
 

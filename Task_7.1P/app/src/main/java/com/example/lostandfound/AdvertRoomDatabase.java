@@ -46,9 +46,9 @@ public abstract class AdvertRoomDatabase extends RoomDatabase {
             databaseWriteExecutor.execute(() -> {
                 AdvertDao dao = INSTANCE.advertDao();
 
-                AdvertEntity advert = new AdvertEntity("Lost Phone", "8675309", "Electronics",
-                        "Lost my phone at the shops :(", new Date(), "The shops");
-                dao.insertAdvert(advert);
+//                AdvertEntity advert = new AdvertEntity("Lost Phone", "8675309", "Electronics",
+//                        "Lost my phone at the shops :(", new Date(), "The shops");
+//                dao.insertAdvert(advert);
             });
         }
     };

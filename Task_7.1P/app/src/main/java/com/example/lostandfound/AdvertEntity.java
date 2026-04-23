@@ -1,5 +1,7 @@
 package com.example.lostandfound;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -25,17 +27,18 @@ public class AdvertEntity {
 
     public String advertLocation;
 
-    @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
-    public byte[] advertImage;
+    public String advertImage;
 
     public AdvertEntity(@NonNull String advertTitle, @NonNull String advertPhone,
                         @NonNull String advertCategory, @NonNull String advertDescription,
-                        @NonNull Date advertDate, @NonNull String advertLocation) {
+                        @NonNull Date advertDate, @NonNull String advertLocation,
+                        @NonNull String advertImage) {
         this.advertTitle = advertTitle;
         this.advertPhone = advertPhone;
         this.advertCategory = advertCategory;
         this.advertDescription = advertDescription;
         this.advertDate = advertDate;
         this.advertLocation = advertLocation;
+        this.advertImage = advertImage;
     }
 }
