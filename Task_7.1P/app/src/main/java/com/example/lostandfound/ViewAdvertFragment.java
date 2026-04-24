@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+
 public class ViewAdvertFragment extends Fragment {
 
     int position;
@@ -22,6 +24,8 @@ public class ViewAdvertFragment extends Fragment {
     private AdvertEntity advertEntity;
 
     private MainActivity mainActivity;
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy MMM dd");
 
     public ViewAdvertFragment(int position) {
         // Required empty public constructor
@@ -41,8 +45,11 @@ public class ViewAdvertFragment extends Fragment {
 
         TextView advertTitle = thisFragmentView.findViewById(R.id.advert_title);
         advertTitle.setText(advertEntity.advertTitle);
+
+        String dateString = sdf.format(advertEntity.advertDate.getTime());
+
         TextView advertDate = thisFragmentView.findViewById(R.id.advert_date);
-        advertDate.setText(advertEntity.advertDate.toString());
+        advertDate.setText(dateString);
         TextView advertLocation = thisFragmentView.findViewById(R.id.advert_location);
         advertLocation.setText(advertEntity.advertLocation);
         TextView advertDescription = thisFragmentView.findViewById(R.id.advert_description);

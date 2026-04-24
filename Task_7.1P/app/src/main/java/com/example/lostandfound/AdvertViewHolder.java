@@ -7,15 +7,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 class AdvertViewHolder extends RecyclerView.ViewHolder implements RecyclerViewInterface {
 
-    private final TextView advertTitleView, advertDateView;
-    private final Button openAdvert, deleteAdvert;
-
+    private final TextView advertTitleView, advertDateView, advertLabelView;
+    private final Button openAdvert;
     private AdvertRepository advertRepository;
 
     private MainActivity mainActivity;
@@ -28,9 +29,9 @@ class AdvertViewHolder extends RecyclerView.ViewHolder implements RecyclerViewIn
 
         advertTitleView = itemView.findViewById(R.id.advert_title);
         advertDateView = itemView.findViewById(R.id.advert_date);
+        advertLabelView = itemView.findViewById(R.id.advert_label);
 
         openAdvert = itemView.findViewById(R.id.open_advert_button);
-        deleteAdvert = itemView.findViewById(R.id.remove_advert_button);
 
         advertRepository = new AdvertRepository(new Application());
 
@@ -45,6 +46,9 @@ class AdvertViewHolder extends RecyclerView.ViewHolder implements RecyclerViewIn
         // Pass relevant info to the recyler
         advertTitleView.setText(advertEntity.advertTitle);
         advertDateView.setText(dateString);
+
+        // Change Item Label based on lost/found category
+        advertLabelView.setText(advertEntity.advertType);
 
         openAdvert.setOnClickListener(new View.OnClickListener() {
             @Override

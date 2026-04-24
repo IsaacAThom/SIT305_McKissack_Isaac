@@ -42,13 +42,8 @@ public abstract class AdvertRoomDatabase extends RoomDatabase {
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
 
-            //Debug content - adds a default advert (no image tho, i have to figure that out)
             databaseWriteExecutor.execute(() -> {
                 AdvertDao dao = INSTANCE.advertDao();
-
-//                AdvertEntity advert = new AdvertEntity("Lost Phone", "8675309", "Electronics",
-//                        "Lost my phone at the shops :(", new Date(), "The shops");
-//                dao.insertAdvert(advert);
             });
         }
     };

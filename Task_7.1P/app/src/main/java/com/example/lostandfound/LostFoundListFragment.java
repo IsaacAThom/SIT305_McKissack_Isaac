@@ -57,7 +57,6 @@ public class LostFoundListFragment extends Fragment implements AdapterView.OnIte
         });
 
         // Set up spinner for category filtering
-        // Probably need a button for clearing filter, and some layout stuff too
         advertCategory = thisFragmentView.findViewById(R.id.form_category_filter);
 
         ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(

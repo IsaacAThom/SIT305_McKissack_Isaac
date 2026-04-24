@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -45,6 +46,8 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
     private AdvertViewModel advertViewModel;
 
     AdvertEntity newAdvert;
+
+    String advertType;
 
     public NewAdvertFragment() {
         // Required empty public constructor
@@ -111,6 +114,24 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
 
         advertImagePreview = thisFragmentView.findViewById(R.id.form_image_preview);
 
+        // Radio Group handling
+        RadioButton radioLost = thisFragmentView.findViewById(R.id.radio_lost);
+        RadioButton radioFound = thisFragmentView.findViewById(R.id.radio_found);
+
+        radioLost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                advertType = "Lost";
+            }
+        });
+
+        radioFound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                advertType = "Found";
+            }
+        });
+
 
         Button saveAdvert = thisFragmentView.findViewById(R.id.advert_save_button);
         saveAdvert.setOnClickListener(new View.OnClickListener() {
@@ -132,6 +153,11 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                     Toast.makeText(thisFragmentView.getContext(), "Error: No Image Selected",
                             Toast.LENGTH_LONG).show();
                 }
+                // One of the radios must be selected
+                else if(!radioLost.isChecked() && !radioFound.isChecked()) {
+                    Toast.makeText(thisFragmentView.getContext(), "Error: Must Select if Advert " +
+                            "is for Lost or Found Item", Toast.LENGTH_LONG).show();
+                }
                 // All clear!
                 else {
                     String advertTitle = String.valueOf(editAdvertTitle.getText());
@@ -148,7 +174,7 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                     String advertImage = selectedImageUri.toString();
 
                     newAdvert = new AdvertEntity(advertTitle, advertPhone, advertCategory,
-                            advertDescription, setDate, advertLocation, advertImage);
+                            advertDescription, setDate, advertLocation, advertImage, advertType);
 
                     advertViewModel.insert(newAdvert);
 
@@ -157,15 +183,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                 }
             }
         });
-
-
-        // You also need to get the image upload working. I believe in you bud.
-        // You will also need a converter from bitmap to byte and back, as well as a date
-        // converter possibly
-        // https://stackoverflow.com/questions/9107900/how-to-upload-image-from-gallery-in-android
-        // https://stackoverflow.com/questions/46337519/how-insert-image-in-room-persistence
-        // Basically hte upload img button should trigger a oopup to the gallery, select an
-        // image, yeehaw. i dont have any images on this "phone" so we'll see what happens
 
         return thisFragmentView;
     }
