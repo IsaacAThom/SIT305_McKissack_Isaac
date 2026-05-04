@@ -15,3 +15,5 @@ currently hardcoded, so adding new categories will require manual correction in 
 Currently navigation is only possible by backtracking, with no central navigation bar. This can 
 cause problems after advert deletion, as the LostFoundListFragment will be on the backstack 
 twice or more. Either restart the app or keep hitting back to return to the main screen.
+
+API key stored in hidden file api_key_storage

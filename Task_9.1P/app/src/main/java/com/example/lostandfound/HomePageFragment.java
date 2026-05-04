@@ -9,11 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomePageFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HomePageFragment extends Fragment {
 
     public MainActivity mainActivity;
@@ -35,9 +30,13 @@ public class HomePageFragment extends Fragment {
 
         Button lostAndFoundListButton = thisFragmentView.findViewById(R.id.show_list_button);
 
+        Button mapViewButton = thisFragmentView.findViewById(R.id.show_map_button);
+
         addAdvertButton.setOnClickListener(view -> mainActivity.showNewAdvert());
 
         lostAndFoundListButton.setOnClickListener(view -> mainActivity.showLostAndFoundList());
+
+        mapViewButton.setOnClickListener(view -> mainActivity.showMapView());
 
         return thisFragmentView;
     }

@@ -2,11 +2,7 @@ package com.example.lostandfound;
 
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -30,6 +26,11 @@ public class MainActivity extends AppCompatActivity {
     // Has to pass position of entity for fetching
     public void showViewAdvert(int position) {
         showNewFragmentInMainFragmentContainerView(new ViewAdvertFragment(position));
+    }
+
+    // Will need a new button to summon the Map View (god have mercy)
+    public void showMapView() {
+        showNewFragmentInMainFragmentContainerView(new MapsAllViewFragment());
     }
 
     // Pushes Fragments into the main display, and adds them to the backstack appropriately
