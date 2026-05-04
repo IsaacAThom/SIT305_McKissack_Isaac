@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+res/values/api_key_storage.xml
+values/api_key_storage.xml
+api_key_storage.xml
