@@ -7,12 +7,27 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.PlacesClient;
+
 public class MainActivity extends AppCompatActivity {
+
+    String apiKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        apiKey = getString(R.string.google_maps_api);
+
+        if (!Places.isInitialized()) {
+            // Initialize the SDK
+            Places.initializeWithNewPlacesApiEnabled(getApplicationContext(), apiKey);
+        }
+
+        // Create new Places client instance
+        PlacesClient placesClient = Places.createClient(this);
     }
 
     public void showNewAdvert() {

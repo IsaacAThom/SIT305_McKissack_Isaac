@@ -159,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:fontFamily="sans-serif-black"
-                android:labelFor="@id/form_location_edit"
+                android:labelFor="@id/form_autocomplete_location"
                 android:text="Location:"
                 android:textSize="20sp" />
 
@@ -168,12 +168,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/form_location_edit"
+                <!-- Convert this to a gmaps thingo? Places SDK widget?
+                https://developers.google.com/maps/documentation/places/android-sdk/place-autocomplete#java ???
+                 https://developers.google.com/maps/documentation/places/android-sdk/autocomplete-tutorial
+                 -->
+
+                <fragment
+                    android:id="@+id/form_autocomplete_location"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Where did this happen?" />
+                    android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+                    />
+
             </com.google.android.material.textfield.TextInputLayout>
+            <Button
+                android:id="@+id/form_location_current_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:layout_marginTop="5dp"
+                android:text="Get Current Location"
+                />
 
                 <!-- Image stuff - https://stackoverflow.com/questions/9107900/how-to-upload-image-from-gallery-in-android
                 https://stackoverflow.com/questions/46337519/how-insert-image-in-room-persistence
@@ -185,7 +200,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:fontFamily="sans-serif-black"
-                android:labelFor="@id/form_location_edit"
+                android:labelFor="@id/form_image_upload"
                 android:text="Photo:"
                 android:textSize="20sp" />
 

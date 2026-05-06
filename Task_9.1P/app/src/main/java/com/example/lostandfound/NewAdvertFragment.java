@@ -2,16 +2,22 @@ package com.example.lostandfound;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +31,14 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -48,6 +62,10 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
     AdvertEntity newAdvert;
 
     String advertType;
+
+    PlacesClient placesClient;
+
+    Place selectedPlace;
 
     public NewAdvertFragment() {
         // Required empty public constructor
@@ -110,7 +128,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
         EditText editAdvertTitle = thisFragmentView.findViewById(R.id.form_name_edit);
         EditText editAdvertPhone = thisFragmentView.findViewById(R.id.form_phone_edit);
         EditText editAdvertDescription = thisFragmentView.findViewById(R.id.form_description_edit);
-        EditText editAdvertLocation = thisFragmentView.findViewById(R.id.form_location_edit);
 
         advertImagePreview = thisFragmentView.findViewById(R.id.form_image_preview);
 
@@ -132,13 +149,45 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
             }
         });
 
+        // Location Situation
+        // Initialise place if somehow it hasn't been
+        if (!Places.isInitialized()) {
+            Places.initialize(getActivity().getApplicationContext(), getString(R.string.google_maps_api));
+        }
+
+        // Create the client for access to API
+        placesClient = Places.createClient(getActivity().getApplicationContext());
+
+        // Initialize AutocompleteSupportFragment
+        AutocompleteSupportFragment autocompleteFragment =
+                (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.form_autocomplete_location);
+
+        // Set the fields for display when autocompleting
+        assert autocompleteFragment != null;
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID,
+                Place.Field.DISPLAY_NAME, Place.Field.FORMATTED_ADDRESS));
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                Log.i("AUTOCOMPLETE", "Place: " +  place.getDisplayName() + ", " + place.getId());
+                selectedPlace = place;
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                Log.e("AUTOCOMPLETE", "An error occurred: " + status);
+            }
+        });
+
+        Button currentLocationButton = thisFragmentView.findViewById(R.id.form_location_current_button);
 
         Button saveAdvert = thisFragmentView.findViewById(R.id.advert_save_button);
         saveAdvert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // All text fields filled
-                if (TextUtils.isEmpty(editAdvertTitle.getText()) || TextUtils.isEmpty(editAdvertPhone.getText()) || TextUtils.isEmpty(editAdvertDescription.getText()) || TextUtils.isEmpty(editAdvertLocation.getText())) {
+                if (TextUtils.isEmpty(editAdvertTitle.getText()) || TextUtils.isEmpty(editAdvertPhone.getText()) || TextUtils.isEmpty(editAdvertDescription.getText()) ) {
                     Toast.makeText(thisFragmentView.getContext(), "Error: Advert Not Fully Filled" +
                                     " In",
                             Toast.LENGTH_LONG).show();
@@ -146,6 +195,11 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                 // Date must be today or earlier
                 else if(advertDate.after(today)) {
                     Toast.makeText(thisFragmentView.getContext(), "Error: Advert Date is in the future",
+                            Toast.LENGTH_LONG).show();
+                }
+                // Check that a location has been entered
+                else if(selectedPlace == null) {
+                    Toast.makeText(thisFragmentView.getContext(), "Error: No Location Selected",
                             Toast.LENGTH_LONG).show();
                 }
                 // Image uploaded check
@@ -163,7 +217,7 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                     String advertTitle = String.valueOf(editAdvertTitle.getText());
                     String advertPhone = String.valueOf(editAdvertPhone.getText());
                     String advertDescription = String.valueOf(editAdvertDescription.getText());
-                    String advertLocation = String.valueOf(editAdvertLocation.getText());
+                    String advertLocation = selectedPlace.getDisplayName();
 
                     // Convert to Date for storage
                     Date setDate = advertDate.getTime();
@@ -173,13 +227,20 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
 
                     String advertImage = selectedImageUri.toString();
 
+                    // Get Place ID
+                    String advertPlaceID = selectedPlace.getId();
+
                     newAdvert = new AdvertEntity(advertTitle, advertPhone, advertCategory,
-                            advertDescription, setDate, advertLocation, advertImage, advertType);
+                            advertDescription, setDate, advertLocation, advertImage, advertType,
+                            advertPlaceID);
 
                     advertViewModel.insert(newAdvert);
 
                     Toast.makeText(thisFragmentView.getContext(), "Advert Added",
                             Toast.LENGTH_LONG).show();
+
+                    Log.d("NEW ADVERT",
+                            "Advert Added: " + newAdvert.advertPlaceID);
                 }
             }
         });
@@ -243,6 +304,8 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                 return "Other";
         }
     }
+
+
 
 
 }
