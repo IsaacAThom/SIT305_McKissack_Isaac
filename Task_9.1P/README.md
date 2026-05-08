@@ -17,3 +17,8 @@ cause problems after advert deletion, as the LostFoundListFragment will be on th
 twice or more. Either restart the app or keep hitting back to return to the main screen.
 
 API key stored in hidden file api_key_storage
+
+Relevant reference sources for the Map Interface, Permissions, and CurrentLocation finder 
+functionalities
+https://developers.google.com/maps/documentation/places/android-sdk/place-id
+www.youtube.com/watch?v=mwzKYIB9cQs

@@ -2,8 +2,14 @@ package com.example.lostandfound;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +18,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -32,8 +39,18 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
@@ -41,6 +58,7 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -66,6 +84,24 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
     PlacesClient placesClient;
 
     Place selectedPlace;
+
+    MainActivity mainActivity;
+
+    private FusedLocationProviderClient fusedLocationClient;
+
+    // Getting Current Place as Place Object (goddddd)
+    private static final int M_MAX_ENTRIES = 5;
+    private String[] likelyPlaceIds;
+    private String[] likelyPlaceNames;
+    private String[] likelyPlaceAddresses;
+    private List[] likelyPlaceAttributions;
+
+    final List<Place.Field> placeFields =
+            Arrays.asList(
+                    Place.Field.ID,
+                    Place.Field.DISPLAY_NAME,
+                    Place.Field.FORMATTED_ADDRESS
+            );
 
     public NewAdvertFragment() {
         // Required empty public constructor
@@ -164,8 +200,7 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
 
         // Set the fields for display when autocompleting
         assert autocompleteFragment != null;
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID,
-                Place.Field.DISPLAY_NAME, Place.Field.FORMATTED_ADDRESS));
+        autocompleteFragment.setPlaceFields(placeFields);
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -181,6 +216,27 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
         });
 
         Button currentLocationButton = thisFragmentView.findViewById(R.id.form_location_current_button);
+
+        // Fetch last known location on phone and feed it
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
+
+        mainActivity = (MainActivity) getActivity();
+
+        currentLocationButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("MissingPermission")
+            @Override
+            public void onClick(View v) {
+                Log.d("LOCATION", "Location button clicked");
+                if(mainActivity.getCurrentLocation2()) {
+                    Log.d("LOCATION", "Locations good to go");
+                    showCurrentPlace();
+                }
+                else {
+                    Log.d("LOCATION", "Uhoh!");
+                }
+
+            }
+        });
 
         Button saveAdvert = thisFragmentView.findViewById(R.id.advert_save_button);
         saveAdvert.setOnClickListener(new View.OnClickListener() {
@@ -305,7 +361,91 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
         }
     }
 
+    // https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
+    // Find current place
+    private void showCurrentPlace() {
+        // If permission granted
+        if (mainActivity.getCurrentLocation2()) {
+            // Use the builder to create a FindCurrentPlaceRequest.
+            FindCurrentPlaceRequest request =
+                    FindCurrentPlaceRequest.newInstance(placeFields);
 
+            Log.d("LOCATION", request.toString());
 
+            @SuppressWarnings("MissingPermission")
+            Task<FindCurrentPlaceResponse> placeResult = placesClient.findCurrentPlace(request);
+            placeResult.addOnCompleteListener(new OnCompleteListener<FindCurrentPlaceResponse>() {
+                @Override
+                public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        FindCurrentPlaceResponse likelyPlaces = task.getResult();
+                        Log.d("LOCATION", likelyPlaces.toString());
+                        // Set the count, handling cases where less than 5 entries are returned.
+                        int count;
+                        if (likelyPlaces.getPlaceLikelihoods().size() < M_MAX_ENTRIES) {
+                            count = likelyPlaces.getPlaceLikelihoods().size();
+                        } else {
+                            count = M_MAX_ENTRIES;
+                        }
+
+                        // List of attributes being acquired
+                        int i = 0;
+                        likelyPlaceIds = new String[count];
+                        likelyPlaceNames = new String[count];
+                        likelyPlaceAddresses = new String[count];
+                        likelyPlaceAttributions = new List[count];
+
+                        for (PlaceLikelihood placeLikelihood : likelyPlaces.getPlaceLikelihoods()) {
+                            // Build a list of likely places to show the user.
+                            // Change what fields are shown, bc the options are wild, man.
+                            likelyPlaceIds[i] = placeLikelihood.getPlace().getId();
+                            likelyPlaceNames[i] = placeLikelihood.getPlace().getDisplayName();
+                            likelyPlaceAddresses[i] = placeLikelihood.getPlace().getAdrFormatAddress();
+                            likelyPlaceAttributions[i] = placeLikelihood.getPlace()
+                                    .getAttributions();
+                            i++;
+                            if (i > (count - 1)) {
+                                break;
+                            }
+                        }
+
+                        // Dialog for selecting which place it is
+                        openPlacesDialog();
+                    }
+                }
+            });
+        }
+        else {
+            Log.i("LOCATION", "The user did not grant location permission.");
+        }
+    }
+
+    // Selecting which place it is from a list of options
+    private void openPlacesDialog() {
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String markerID = likelyPlaceIds[which];
+                String markerAddress = likelyPlaceAddresses[which];
+                if (likelyPlaceAttributions[which] != null) {
+                    markerAddress = markerAddress + "\n" + likelyPlaceAttributions[which];
+                }
+
+                // Get place from likelyPlacesIds[which], basically
+                FetchPlaceRequest request = FetchPlaceRequest.newInstance(likelyPlaceIds[which],
+                        placeFields);
+
+                placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+                    selectedPlace = response.getPlace();
+                });
+            }
+        };
+
+        // Display the selection dialog
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle("Choose a place")
+                .setItems(likelyPlaceNames, listener)
+                .show();
+    }
 
 }
