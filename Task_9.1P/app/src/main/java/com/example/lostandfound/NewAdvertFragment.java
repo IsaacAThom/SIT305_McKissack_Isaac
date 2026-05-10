@@ -36,6 +36,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
@@ -102,6 +103,8 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                     Place.Field.DISPLAY_NAME,
                     Place.Field.FORMATTED_ADDRESS
             );
+
+    TextView selectedLocation;
 
     public NewAdvertFragment() {
         // Required empty public constructor
@@ -222,12 +225,15 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
 
         mainActivity = (MainActivity) getActivity();
 
+        selectedLocation = thisFragmentView.findViewById(R.id.form_selected_location);
+
         currentLocationButton.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View v) {
                 Log.d("LOCATION", "Location button clicked");
-                if(mainActivity.getCurrentLocation2()) {
+                // Checks permissions
+                if(mainActivity.getCurrentLocation()) {
                     Log.d("LOCATION", "Locations good to go");
                     showCurrentPlace();
                 }
@@ -364,60 +370,54 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
     // https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
     // Find current place
     private void showCurrentPlace() {
-        // If permission granted
-        if (mainActivity.getCurrentLocation2()) {
-            // Use the builder to create a FindCurrentPlaceRequest.
-            FindCurrentPlaceRequest request =
-                    FindCurrentPlaceRequest.newInstance(placeFields);
+        // Use the builder to create a FindCurrentPlaceRequest.
+        FindCurrentPlaceRequest request =
+                FindCurrentPlaceRequest.newInstance(placeFields);
 
-            Log.d("LOCATION", request.toString());
+        Log.d("LOCATION", request.toString());
 
-            @SuppressWarnings("MissingPermission")
-            Task<FindCurrentPlaceResponse> placeResult = placesClient.findCurrentPlace(request);
-            placeResult.addOnCompleteListener(new OnCompleteListener<FindCurrentPlaceResponse>() {
-                @Override
-                public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        FindCurrentPlaceResponse likelyPlaces = task.getResult();
-                        Log.d("LOCATION", likelyPlaces.toString());
-                        // Set the count, handling cases where less than 5 entries are returned.
-                        int count;
-                        if (likelyPlaces.getPlaceLikelihoods().size() < M_MAX_ENTRIES) {
-                            count = likelyPlaces.getPlaceLikelihoods().size();
-                        } else {
-                            count = M_MAX_ENTRIES;
-                        }
-
-                        // List of attributes being acquired
-                        int i = 0;
-                        likelyPlaceIds = new String[count];
-                        likelyPlaceNames = new String[count];
-                        likelyPlaceAddresses = new String[count];
-                        likelyPlaceAttributions = new List[count];
-
-                        for (PlaceLikelihood placeLikelihood : likelyPlaces.getPlaceLikelihoods()) {
-                            // Build a list of likely places to show the user.
-                            // Change what fields are shown, bc the options are wild, man.
-                            likelyPlaceIds[i] = placeLikelihood.getPlace().getId();
-                            likelyPlaceNames[i] = placeLikelihood.getPlace().getDisplayName();
-                            likelyPlaceAddresses[i] = placeLikelihood.getPlace().getAdrFormatAddress();
-                            likelyPlaceAttributions[i] = placeLikelihood.getPlace()
-                                    .getAttributions();
-                            i++;
-                            if (i > (count - 1)) {
-                                break;
-                            }
-                        }
-
-                        // Dialog for selecting which place it is
-                        openPlacesDialog();
+        @SuppressWarnings("MissingPermission")
+        Task<FindCurrentPlaceResponse> placeResult = placesClient.findCurrentPlace(request);
+        placeResult.addOnCompleteListener(new OnCompleteListener<FindCurrentPlaceResponse>() {
+            @Override
+            public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    FindCurrentPlaceResponse likelyPlaces = task.getResult();
+                    Log.d("LOCATION", likelyPlaces.toString());
+                    // Set the count, handling cases where less than 5 entries are returned.
+                    int count;
+                    if (likelyPlaces.getPlaceLikelihoods().size() < M_MAX_ENTRIES) {
+                        count = likelyPlaces.getPlaceLikelihoods().size();
+                    } else {
+                        count = M_MAX_ENTRIES;
                     }
+
+                    // List of attributes being acquired
+                    int i = 0;
+                    likelyPlaceIds = new String[count];
+                    likelyPlaceNames = new String[count];
+                    likelyPlaceAddresses = new String[count];
+                    likelyPlaceAttributions = new List[count];
+
+                    for (PlaceLikelihood placeLikelihood : likelyPlaces.getPlaceLikelihoods()) {
+                        // Build a list of likely places to show the user.
+                        // Change what fields are shown, bc the options are wild, man.
+                        likelyPlaceIds[i] = placeLikelihood.getPlace().getId();
+                        likelyPlaceNames[i] = placeLikelihood.getPlace().getDisplayName();
+                        likelyPlaceAddresses[i] = placeLikelihood.getPlace().getAdrFormatAddress();
+                        likelyPlaceAttributions[i] = placeLikelihood.getPlace()
+                                .getAttributions();
+                        i++;
+                        if (i > (count - 1)) {
+                            break;
+                        }
+                    }
+
+                    // Dialog for selecting which place it is
+                    openPlacesDialog();
                 }
-            });
-        }
-        else {
-            Log.i("LOCATION", "The user did not grant location permission.");
-        }
+            }
+        });
     }
 
     // Selecting which place it is from a list of options
@@ -437,6 +437,10 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
 
                 placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
                     selectedPlace = response.getPlace();
+                    // Shows the result so the user can go 'wait, not that one'
+                    // This is not a good solution to this problem.
+                    // Ideally the autocomplete would take this over. IDK how to do that
+                    selectedLocation.setText(selectedPlace.getDisplayName());
                 });
             }
         };

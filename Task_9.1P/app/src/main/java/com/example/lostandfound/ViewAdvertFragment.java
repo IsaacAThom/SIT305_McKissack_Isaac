@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,11 @@ public class ViewAdvertFragment extends Fragment {
         advertViewModel = new ViewModelProvider(this).get(AdvertViewModel.class);
 
         advertEntity = advertViewModel.getAdvert(position);
+
+        Log.d("TEST", "Entity uid: " + position);
+
+        TextView advertTypeLabel = thisFragmentView.findViewById(R.id.advert_type_label);
+        advertTypeLabel.setText(advertEntity.advertType + " Advert");
 
         TextView advertTitle = thisFragmentView.findViewById(R.id.advert_title);
         advertTitle.setText(advertEntity.advertTitle);

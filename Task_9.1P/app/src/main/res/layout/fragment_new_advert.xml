@@ -190,6 +190,13 @@
                 android:text="Get Current Location"
                 />
 
+            <TextView
+                android:id="@+id/form_selected_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                />
+
                 <!-- Image stuff - https://stackoverflow.com/questions/9107900/how-to-upload-image-from-gallery-in-android
                 https://stackoverflow.com/questions/46337519/how-insert-image-in-room-persistence
                 -library -->

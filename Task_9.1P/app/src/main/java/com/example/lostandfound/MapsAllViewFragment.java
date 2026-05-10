@@ -5,9 +5,12 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +21,21 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MapsAllViewFragment extends Fragment {
+
+    GoogleMap map;
+
+    private AdvertViewModel advertViewModel;
+
+    PlacesClient placesClient;
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -34,11 +50,49 @@ public class MapsAllViewFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            LatLng sydney = new LatLng(-34, 151);
-            googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            map = googleMap;
 
-            googleMap.getUiSettings().setZoomControlsEnabled(true);
+//            final List<Place.Field> placeFields =
+//                Arrays.asList(
+//                        Place.Field.ID,
+//                        Place.Field.DISPLAY_NAME,
+//                        Place.Field.FORMATTED_ADDRESS,
+//                        Place.Field.LOCATION
+//                );
+//
+//                int markerCount = advertViewModel.getRowCount();
+//                Log.d("MAP", "Marker Count: " + String.valueOf(markerCount));
+//
+//                // maybe I need an observer? which will be annoying, trust
+//                // https://www.youtube.com/watch?v=r-OoaF9tJCg&list=PL7NYbSE8uaBCSkZum6Z88RvjiXrTBpjT2&index=3
+//
+//                // Attempt to invoke get on null object reference.
+//                if(markerCount > 0) {
+//                for(int i = 0; i < markerCount; i++) {
+//                    // Get the place from the placeID saved in the RoomDB
+//                    try {
+//                        AdvertEntity advert = advertViewModel.getAllAdvertsMapList().get(i);
+//
+//                        final FetchPlaceRequest request =
+//                                FetchPlaceRequest.newInstance(advert.advertPlaceID, placeFields);
+//
+//                        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+//                            Place place = response.getPlace();
+//                            Log.d("MAP", "Place found: " + place.getDisplayName());
+//                            LatLng latLng = place.getLocation();
+//                            Log.d("MAP", "Lat: " + latLng.latitude + " Long: " + latLng.longitude);
+//                            map.addMarker(new MarkerOptions().position(latLng).title(advert.advertTitle));
+//                        }).addOnFailureListener((exception) -> {
+//                            Log.e("MAP", "Place not found: " + exception.getMessage());
+//                        });
+//                    } catch (Exception e) {
+//                        Log.d("MAP", "No entry at position: " + i + " - " + e);
+//                    }
+//
+//                }
+//            }
+
+            map.getUiSettings().setZoomControlsEnabled(true);
         }
     };
 
@@ -47,7 +101,19 @@ public class MapsAllViewFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_maps, container, false);
+        View thisFragmentView = inflater.inflate(R.layout.fragment_maps, container, false);
+
+        advertViewModel = new ViewModelProvider(this).get(AdvertViewModel.class);
+
+        placesClient = Places.createClient(getActivity().getApplicationContext());
+
+        // NOW!! in theory. we can alter populateMap() to take a list of adverts as a variable
+        // which it will then iterate through, with a for loop, in order to get The Shit?
+        // I don't know if we need to filter the markers through the room db or through the api.
+        // probably the API right?
+        populateMap();
+
+        return thisFragmentView;
     }
 
     @Override
@@ -57,6 +123,46 @@ public class MapsAllViewFragment extends Fragment {
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
+        }
+    }
+
+    public void populateMap() {
+        final List<Place.Field> placeFields =
+                Arrays.asList(
+                        Place.Field.ID,
+                        Place.Field.DISPLAY_NAME,
+                        Place.Field.FORMATTED_ADDRESS,
+                        Place.Field.LOCATION
+                );
+
+        int markerCount = advertViewModel.getRowCount();
+        Log.d("MAP", "Marker Count: " + String.valueOf(markerCount));
+
+        if(markerCount > 0) {
+            for(int i = 0; i < markerCount; i++) {
+                // Get the place from the placeID saved in the RoomDB
+                try {
+                    AdvertEntity advert = advertViewModel.getAllAdvertsMapList().get(i);
+
+                    final FetchPlaceRequest request =
+                            FetchPlaceRequest.newInstance(advert.advertPlaceID, placeFields);
+
+                    placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+                        Place place = response.getPlace();
+                        Log.d("MAP", "Place found: " + place.getDisplayName());
+                        LatLng latLng = place.getLocation();
+                        Log.d("MAP", "Lat: " + latLng.latitude + " Long: " + latLng.longitude);
+
+                        // Adding the marker
+                        map.addMarker(new MarkerOptions().position(latLng).title(advert.advertTitle).snippet(advert.advertDescription));
+                    }).addOnFailureListener((exception) -> {
+                        Log.e("MAP", "Place not found: " + exception.getMessage());
+                    });
+                } catch (Exception e) {
+                    Log.d("MAP", "No entry at position: " + i + " - " + e);
+                }
+
+            }
         }
     }
 }

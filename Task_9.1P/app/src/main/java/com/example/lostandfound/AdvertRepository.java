@@ -38,4 +38,10 @@ public class AdvertRepository {
 
     // Get filtered adverts
     LiveData<List<AdvertEntity>> getFilteredAdverts(String category) { return advertDao.getFilteredAdverts(category);}
+
+    // Get row count
+    Integer getRowCount() { return advertDao.getRowCount(); }
+
+    // Get unordered list for maps
+    List<AdvertEntity> getAllAdvertsMapList() { return advertDao.getAllAdvertsMapList(); }
 }

@@ -31,4 +31,7 @@ public class AdvertViewModel extends AndroidViewModel {
 
     LiveData<List<AdvertEntity>> getFilteredAdverts(String category) { return advertRepository.getFilteredAdverts(category); }
 
+    Integer getRowCount() { return advertRepository.getRowCount(); }
+
+    List<AdvertEntity> getAllAdvertsMapList() { return advertRepository.getAllAdvertsMapList(); }
 }

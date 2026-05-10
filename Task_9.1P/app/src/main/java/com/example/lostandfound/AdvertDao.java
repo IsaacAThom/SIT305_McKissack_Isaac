@@ -30,4 +30,12 @@ public interface AdvertDao {
     // Retrieve specific event for viewing
     @Query("SELECT * FROM advert_table WHERE uid = :id")
     AdvertEntity getAdvert(int id);
+
+    // Retrieve row count
+    @Query("SELECT COUNT(*) FROM advert_table")
+    Integer getRowCount();
+
+    // Fetch all events, order not-important, as a list for map purposes
+    @Query("SELECT * FROM advert_table")
+    List<AdvertEntity> getAllAdvertsMapList();
 }

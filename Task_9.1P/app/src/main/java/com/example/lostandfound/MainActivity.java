@@ -93,42 +93,8 @@ public class MainActivity extends AppCompatActivity {
 
     // https://www.youtube.com/watch?v=mwzKYIB9cQs please for the love of god
     // Objective - get permissions working. Ask permission to get location data on launch
-    // it can send us back to this collection when necessary if we make the core function public
-    // + accessible to the other fragments i think. i hope anyway.
-    @SuppressLint("MissingPermission")
-    void getCurrentLocation() {
-        if(checkPermissions()) {
-            if(isLocationEnabled()) {
-                // get final lat/long
-                mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        Location location = task.getResult();
-                        if (location == null) {
-                            Log.d("LOCATION", "Null received" );
-                        }
-                        else {
-                            Log.d("LOCATION", "Latitude: " + location.getLatitude() + " Longitude" +
-                                    ": " + location.getLongitude() );
-                        }
-                    }
-                });
-            }
-            else {
-                // Open settings to enable location
-                Toast.makeText(this, "Turn on Location", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
-            }
-        }
-        else {
-            // Request permission
 
-            requestPermission();
-        }
-    }
-
-    boolean getCurrentLocation2() {
+    boolean getCurrentLocation() {
         if(checkPermissions()) {
             if(isLocationEnabled()) {
                 // get final lat/long
