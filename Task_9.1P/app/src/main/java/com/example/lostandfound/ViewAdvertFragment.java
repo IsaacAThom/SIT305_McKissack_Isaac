@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
 
 public class ViewAdvertFragment extends Fragment {
@@ -58,6 +60,8 @@ public class ViewAdvertFragment extends Fragment {
         advertDate.setText(dateString);
         TextView advertLocation = thisFragmentView.findViewById(R.id.advert_location);
         advertLocation.setText(advertEntity.advertLocation);
+        TextView advertAddress = thisFragmentView.findViewById(R.id.advert_address);
+        advertAddress.setText(advertEntity.advertAddress);
         TextView advertDescription = thisFragmentView.findViewById(R.id.advert_description);
         advertDescription.setText(advertEntity.advertDescription);
 

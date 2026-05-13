@@ -27,6 +27,8 @@ public class AdvertEntity {
 
     public String advertLocation;
 
+    public String advertAddress;
+
     public String advertImage;
 
     public String advertType;
@@ -36,6 +38,7 @@ public class AdvertEntity {
     public AdvertEntity(@NonNull String advertTitle, @NonNull String advertPhone,
                         @NonNull String advertCategory, @NonNull String advertDescription,
                         @NonNull Date advertDate, @NonNull String advertLocation,
+                        @NonNull String advertAddress,
                         @NonNull String advertImage, @NonNull String advertType,
                         @NonNull String advertPlaceID) {
         this.advertTitle = advertTitle;
@@ -44,6 +47,7 @@ public class AdvertEntity {
         this.advertDescription = advertDescription;
         this.advertDate = advertDate;
         this.advertLocation = advertLocation;
+        this.advertAddress = advertAddress;
         this.advertImage = advertImage;
         this.advertType = advertType;
         this.advertPlaceID = advertPlaceID;

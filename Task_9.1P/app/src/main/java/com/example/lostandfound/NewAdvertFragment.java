@@ -95,6 +95,8 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
     private String[] likelyPlaceAddresses;
     private List[] likelyPlaceAttributions;
 
+    private String[] likelyPlaceSearchDisplay;
+
     final List<Place.Field> placeFields =
             Arrays.asList(
                     Place.Field.ID,
@@ -275,6 +277,7 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                     String advertPhone = String.valueOf(editAdvertPhone.getText());
                     String advertDescription = String.valueOf(editAdvertDescription.getText());
                     String advertLocation = selectedPlace.getDisplayName();
+                    String advertAddress = selectedPlace.getFormattedAddress();
 
                     // Convert to Date for storage
                     Date setDate = advertDate.getTime();
@@ -288,7 +291,8 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                     String advertPlaceID = selectedPlace.getId();
 
                     newAdvert = new AdvertEntity(advertTitle, advertPhone, advertCategory,
-                            advertDescription, setDate, advertLocation, advertImage, advertType,
+                            advertDescription, setDate, advertLocation, advertAddress,
+                            advertImage, advertType,
                             advertPlaceID);
 
                     advertViewModel.insert(newAdvert);
@@ -393,15 +397,19 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                     likelyPlaceNames = new String[count];
                     likelyPlaceAddresses = new String[count];
                     likelyPlaceAttributions = new List[count];
+                    likelyPlaceSearchDisplay = new String[count];
 
                     for (PlaceLikelihood placeLikelihood : likelyPlaces.getPlaceLikelihoods()) {
                         // Build a list of likely places to show the user.
                         // Change what fields are shown, bc the options are wild, man.
                         likelyPlaceIds[i] = placeLikelihood.getPlace().getId();
                         likelyPlaceNames[i] = placeLikelihood.getPlace().getDisplayName();
-                        likelyPlaceAddresses[i] = placeLikelihood.getPlace().getAdrFormatAddress();
-                        likelyPlaceAttributions[i] = placeLikelihood.getPlace()
-                                .getAttributions();
+                        likelyPlaceAddresses[i] = placeLikelihood.getPlace().getFormattedAddress();
+                        // String[] formatted for displaying the options
+                        likelyPlaceSearchDisplay[i] =
+                                likelyPlaceNames[i] + "\n" + likelyPlaceAddresses [i];
+                        Log.d("LOCATION",
+                                i + likelyPlaceIds[i] + " " + likelyPlaceNames[i] + " " + likelyPlaceAddresses[i]);
                         i++;
                         if (i > (count - 1)) {
                             break;
@@ -420,12 +428,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String markerID = likelyPlaceIds[which];
-                String markerAddress = likelyPlaceAddresses[which];
-                if (likelyPlaceAttributions[which] != null) {
-                    markerAddress = markerAddress + "\n" + likelyPlaceAttributions[which];
-                }
-
                 // Get place from likelyPlacesIds[which], basically
                 FetchPlaceRequest request = FetchPlaceRequest.newInstance(likelyPlaceIds[which],
                         placeFields);
@@ -443,7 +445,7 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
         // Display the selection dialog
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle("Choose a place")
-                .setItems(likelyPlaceNames, listener)
+                .setItems(likelyPlaceSearchDisplay, listener)
                 .show();
     }
 

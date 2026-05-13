@@ -61,6 +61,11 @@
                 android:layout_height="wrap_content"
 
                 android:text="Location..." />
+            <TextView
+                android:id="@+id/advert_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Address..."/>
 
             <TextView
                 android:layout_width="match_parent"
