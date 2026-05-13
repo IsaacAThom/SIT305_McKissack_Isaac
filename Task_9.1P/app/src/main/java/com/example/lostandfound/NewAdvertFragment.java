@@ -88,8 +88,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
 
     MainActivity mainActivity;
 
-    private FusedLocationProviderClient fusedLocationClient;
-
     // Getting Current Place as Place Object (goddddd)
     private static final int M_MAX_ENTRIES = 5;
     private String[] likelyPlaceIds;
@@ -220,9 +218,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
 
         Button currentLocationButton = thisFragmentView.findViewById(R.id.form_location_current_button);
 
-        // Fetch last known location on phone and feed it
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-
         mainActivity = (MainActivity) getActivity();
 
         selectedLocation = thisFragmentView.findViewById(R.id.form_selected_location);
@@ -233,7 +228,7 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
             public void onClick(View v) {
                 Log.d("LOCATION", "Location button clicked");
                 // Checks permissions
-                if(mainActivity.getCurrentLocation()) {
+                if(mainActivity.getLocationPermissions()) {
                     Log.d("LOCATION", "Locations good to go");
                     showCurrentPlace();
                 }

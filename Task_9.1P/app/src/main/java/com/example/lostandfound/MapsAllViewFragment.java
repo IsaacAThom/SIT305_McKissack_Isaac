@@ -9,25 +9,34 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public class MapsAllViewFragment extends Fragment {
 
@@ -36,6 +45,24 @@ public class MapsAllViewFragment extends Fragment {
     private AdvertViewModel advertViewModel;
 
     PlacesClient placesClient;
+
+    MainActivity mainActivity;
+
+    SwitchMaterial radiusSearchSwitch;
+
+    private Location lastKnownLocation;
+
+    private static final int DEFAULT_ZOOM = 15;
+
+    // Sydney, for default camera location
+    private final LatLng defaultLocation = new LatLng(-33.8523341, 151.2106085);
+
+    // https://mapsplatform.google.com/resources/blog/how-calculate-distances-map-maps-javascript-api/
+    // Variable for use in the radius calculations - Radius of the earth in KILOMETRES
+    Integer EARTH_RADIUS = 6371;
+
+    // Variable for search radius - defaults to 5
+    Integer SEARCH_RADIUS = 5;
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -52,45 +79,9 @@ public class MapsAllViewFragment extends Fragment {
         public void onMapReady(GoogleMap googleMap) {
             map = googleMap;
 
-//            final List<Place.Field> placeFields =
-//                Arrays.asList(
-//                        Place.Field.ID,
-//                        Place.Field.DISPLAY_NAME,
-//                        Place.Field.FORMATTED_ADDRESS,
-//                        Place.Field.LOCATION
-//                );
-//
-//                int markerCount = advertViewModel.getRowCount();
-//                Log.d("MAP", "Marker Count: " + String.valueOf(markerCount));
-//
-//                // maybe I need an observer? which will be annoying, trust
-//                // https://www.youtube.com/watch?v=r-OoaF9tJCg&list=PL7NYbSE8uaBCSkZum6Z88RvjiXrTBpjT2&index=3
-//
-//                // Attempt to invoke get on null object reference.
-//                if(markerCount > 0) {
-//                for(int i = 0; i < markerCount; i++) {
-//                    // Get the place from the placeID saved in the RoomDB
-//                    try {
-//                        AdvertEntity advert = advertViewModel.getAllAdvertsMapList().get(i);
-//
-//                        final FetchPlaceRequest request =
-//                                FetchPlaceRequest.newInstance(advert.advertPlaceID, placeFields);
-//
-//                        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-//                            Place place = response.getPlace();
-//                            Log.d("MAP", "Place found: " + place.getDisplayName());
-//                            LatLng latLng = place.getLocation();
-//                            Log.d("MAP", "Lat: " + latLng.latitude + " Long: " + latLng.longitude);
-//                            map.addMarker(new MarkerOptions().position(latLng).title(advert.advertTitle));
-//                        }).addOnFailureListener((exception) -> {
-//                            Log.e("MAP", "Place not found: " + exception.getMessage());
-//                        });
-//                    } catch (Exception e) {
-//                        Log.d("MAP", "No entry at position: " + i + " - " + e);
-//                    }
-//
-//                }
-//            }
+            updateLocationUI();
+
+            getDeviceLocation();
 
             map.getUiSettings().setZoomControlsEnabled(true);
         }
@@ -107,11 +98,43 @@ public class MapsAllViewFragment extends Fragment {
 
         placesClient = Places.createClient(getActivity().getApplicationContext());
 
+        mainActivity = (MainActivity) getActivity();
+
+        radiusSearchSwitch = thisFragmentView.findViewById(R.id.radius_search_switch);
+
+        // https://developers.google.com/maps/documentation/places/android-sdk/nearby-search
+        // https://simpledevcode.wordpress.com/2023/07/18/getting-nearby-locations-using-google-maps-api-with-android/ ?
+        // I have no idea how to get it to solely show items within that radius. we'll see.
+        // there'll be a button probably
+        // if im smart the button will be in the ui that only shows up if youve given location
+        // perms lmao
+        // get it to search a ~5km radius, maybe? idgaf about making that scalable really,
+        // default radius
+        // main bit is getting it to ONLY show the items that already have markers. we'll see.
+        // that's a real cunt of it.
+
         // NOW!! in theory. we can alter populateMap() to take a list of adverts as a variable
         // which it will then iterate through, with a for loop, in order to get The Shit?
         // I don't know if we need to filter the markers through the room db or through the api.
         // probably the API right?
-        populateMap();
+        // That filter is the next step here :)
+        populateMap(false);
+
+        radiusSearchSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(lastKnownLocation == null) {
+                    radiusSearchSwitch.setEnabled(false);
+                    Toast.makeText(thisFragmentView.getContext(), "Radius search only possible if" +
+                            " location permissions enabled.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        radiusSearchSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // If switch checked, run radius search. If unchecked, display all markers again.
+            populateMap(isChecked);
+        });
 
         return thisFragmentView;
     }
@@ -126,7 +149,7 @@ public class MapsAllViewFragment extends Fragment {
         }
     }
 
-    public void populateMap() {
+    public void populateMap(boolean radiusRequest) {
         final List<Place.Field> placeFields =
                 Arrays.asList(
                         Place.Field.ID,
@@ -134,6 +157,12 @@ public class MapsAllViewFragment extends Fragment {
                         Place.Field.FORMATTED_ADDRESS,
                         Place.Field.LOCATION
                 );
+
+        // Clear map before population - accounts for updates + radius filter
+        if (map != null) {
+            map.clear();
+            Log.d("MAP", "Map wasn't null");
+        }
 
         int markerCount = advertViewModel.getRowCount();
         Log.d("MAP", "Marker Count: " + String.valueOf(markerCount));
@@ -153,8 +182,23 @@ public class MapsAllViewFragment extends Fragment {
                         LatLng latLng = place.getLocation();
                         Log.d("MAP", "Lat: " + latLng.latitude + " Long: " + latLng.longitude);
 
-                        // Adding the marker
-                        map.addMarker(new MarkerOptions().position(latLng).title(advert.advertTitle).snippet(advert.advertDescription));
+                        // If radius searching, and location known (could be null even w/ perms)
+                        if(radiusRequest && lastKnownLocation != null) {
+
+                            double distance = haversine_distance(lastKnownLocation, place);
+                            Log.d("MAP",
+                                    "Distance: " + distance);
+
+                            // Only add marker if w/i SEARCH_RADIUS
+                            if (distance < SEARCH_RADIUS) {
+                                map.addMarker(new MarkerOptions().position(latLng).title(advert.advertTitle).snippet(advert.advertDescription));
+                            }
+
+                        }
+                        // if not radius searching, or if location not known, add ALL markers
+                        else {
+                            map.addMarker(new MarkerOptions().position(latLng).title(advert.advertTitle).snippet(advert.advertDescription));
+                        }
                     }).addOnFailureListener((exception) -> {
                         Log.e("MAP", "Place not found: " + exception.getMessage());
                     });
@@ -165,18 +209,85 @@ public class MapsAllViewFragment extends Fragment {
             }
         }
     }
-}
 
-// I now have to figure out how to import the LatLngs from the db (stored as two DECIMALS?)
-// And get that to populate. boy howdy. we can only imagine.
-// In theory its just in OnMapReady doing a... for loop? for the length of the whole db right
-// luckily the uid and the index are diff things lmao
-// Basically for loop, extract the decimals, convert to LatLng, add marker, continue until the
-// whole array is done
-// and then uh. Fuck around!!! Find out!!
-// I do also have to figure out how to uh. get this bitch to WORK right
-// inputting the LatLng. in theory i can import a fragment into the scrollview of NewAdvertFragment
-// and then extract the LatLng from it. select. store.
-// sep from the Location which is a text summary. oh i gotta put the maps in the damn views too
-// christ theres 15 maps
-// This one (MapsAllView), new advert (MapsAdd) and view fragment (MapSingleView)
+    // https://developers.google.com/maps/documentation/javascript/examples/control-custom#maps_control_custom-javascript
+    // ^ for the button that on-click sends populateMap(true) :)
+
+    // https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
+    // Enables ui button for resetting camera to current location (if location permissions enabled)
+    private void updateLocationUI() {
+        if (map == null) {
+            return;
+        }
+        try {
+            if (mainActivity.getLocationPermissions()) {
+                map.setMyLocationEnabled(true);
+                map.getUiSettings().setMyLocationButtonEnabled(true);
+            } else {
+                map.setMyLocationEnabled(false);
+                map.getUiSettings().setMyLocationButtonEnabled(false);
+                lastKnownLocation = null;
+            }
+        } catch (SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage());
+        }
+    }
+
+    // Get most recent location from device and use it to set the camera
+    private void getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        try {
+            if (mainActivity.getLocationPermissions()) {
+                // Using the fusedLocationClient initialised in mainActivity, which persists
+                // between fragments better and should not return null pointer
+                Task<Location> locationResult = mainActivity.mFusedLocationClient.getLastLocation();
+                locationResult.addOnCompleteListener(getActivity(), new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            lastKnownLocation = task.getResult();
+                            if (lastKnownLocation != null) {
+                                LatLng currentLocation = new LatLng(lastKnownLocation.getLatitude(),
+                                        lastKnownLocation.getLongitude());
+
+                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                        currentLocation, DEFAULT_ZOOM));
+
+                            }
+                        } else {
+                            Log.d("MAP", "Current location is null. Using defaults.");
+                            Log.e("MAP", "Exception: %s", task.getException());
+                            map.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                            map.getUiSettings().setMyLocationButtonEnabled(false);
+                        }
+                    }
+                });
+            } else {
+                // Just set the default camera location
+                Log.d("MAP", "Location permissions not granted. Using defaults.");
+                map.moveCamera(CameraUpdateFactory
+                        .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                map.getUiSettings().setMyLocationButtonEnabled(false);
+            }
+        } catch (SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage(), e);
+        }
+    }
+
+    // https://mapsplatform.google.com/resources/blog/how-calculate-distances-map-maps-javascript-api/
+    // Calculates the distance between current location and marker place in KM
+    double haversine_distance(Location mk1, Place mk2) {
+        var rlat1 = mk1.getLatitude() * (Math.PI/180); // Convert degrees to radians
+        var rlat2 = mk2.getLocation().latitude * (Math.PI/180); // Convert degrees to radians
+        var difflat = rlat2-rlat1; // Radian difference (latitudes)
+        var difflon = (mk2.getLocation().longitude-mk1.getLongitude()) * (Math.PI/180); // Radian difference
+        // (longitudes)
+        var d = 2 * EARTH_RADIUS * Math.asin(Math.sqrt(Math.sin(difflat/2)*Math.sin(difflat/2)+Math.cos(rlat1)*Math.cos(rlat2)*Math.sin(difflon/2)*Math.sin(difflon/2)));
+        return d;
+    }
+}

@@ -24,6 +24,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     int PERMISSION_ID = 44;
 
     FusedLocationProviderClient mFusedLocationClient;
+
+    Location currentLocation;
 
 
 
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        getCurrentLocation();
+        getLocationPermissions();
     }
 
     public void showNewAdvert() {
@@ -94,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     // https://www.youtube.com/watch?v=mwzKYIB9cQs please for the love of god
     // Objective - get permissions working. Ask permission to get location data on launch
 
-    boolean getCurrentLocation() {
+    boolean getLocationPermissions() {
         if(checkPermissions()) {
             if(isLocationEnabled()) {
                 // get final lat/long
@@ -141,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == PERMISSION_ID) {
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Location Permissions Granted", Toast.LENGTH_SHORT).show();
-                getCurrentLocation();
+                getLocationPermissions();
             }
             else {
                 Toast.makeText(this, "Location Permissions Denied", Toast.LENGTH_SHORT).show();
