@@ -38,10 +38,6 @@ public class MainActivity extends AppCompatActivity {
 
     FusedLocationProviderClient mFusedLocationClient;
 
-    Location currentLocation;
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,9 +49,6 @@ public class MainActivity extends AppCompatActivity {
             // Initialize the SDK
             Places.initializeWithNewPlacesApiEnabled(getApplicationContext(), apiKey);
         }
-
-        // Create new Places client instance
-        PlacesClient placesClient = Places.createClient(this);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -75,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         showNewFragmentInMainFragmentContainerView(new ViewAdvertFragment(position));
     }
 
-    // Will need a new button to summon the Map View (god have mercy)
+    // Will need a new button to summon the Map View
     public void showMapView() {
         showNewFragmentInMainFragmentContainerView(new MapsAllViewFragment());
     }
@@ -94,13 +87,11 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    // https://www.youtube.com/watch?v=mwzKYIB9cQs please for the love of god
-    // Objective - get permissions working. Ask permission to get location data on launch
-
+    // https://www.youtube.com/watch?v=mwzKYIB9cQs
+    // Return true/false for use in other fragments
     boolean getLocationPermissions() {
         if(checkPermissions()) {
             if(isLocationEnabled()) {
-                // get final lat/long
                 return true;
             }
             else {

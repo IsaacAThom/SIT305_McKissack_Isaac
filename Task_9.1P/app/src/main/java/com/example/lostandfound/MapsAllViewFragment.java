@@ -102,22 +102,7 @@ public class MapsAllViewFragment extends Fragment {
 
         radiusSearchSwitch = thisFragmentView.findViewById(R.id.radius_search_switch);
 
-        // https://developers.google.com/maps/documentation/places/android-sdk/nearby-search
-        // https://simpledevcode.wordpress.com/2023/07/18/getting-nearby-locations-using-google-maps-api-with-android/ ?
-        // I have no idea how to get it to solely show items within that radius. we'll see.
-        // there'll be a button probably
-        // if im smart the button will be in the ui that only shows up if youve given location
-        // perms lmao
-        // get it to search a ~5km radius, maybe? idgaf about making that scalable really,
-        // default radius
-        // main bit is getting it to ONLY show the items that already have markers. we'll see.
-        // that's a real cunt of it.
-
-        // NOW!! in theory. we can alter populateMap() to take a list of adverts as a variable
-        // which it will then iterate through, with a for loop, in order to get The Shit?
-        // I don't know if we need to filter the markers through the room db or through the api.
-        // probably the API right?
-        // That filter is the next step here :)
+        // Populate map with ALL markers
         populateMap(false);
 
         radiusSearchSwitch.setOnClickListener(new View.OnClickListener() {
@@ -161,11 +146,9 @@ public class MapsAllViewFragment extends Fragment {
         // Clear map before population - accounts for updates + radius filter
         if (map != null) {
             map.clear();
-            Log.d("MAP", "Map wasn't null");
         }
 
         int markerCount = advertViewModel.getRowCount();
-        Log.d("MAP", "Marker Count: " + String.valueOf(markerCount));
 
         if(markerCount > 0) {
             for(int i = 0; i < markerCount; i++) {
@@ -178,16 +161,12 @@ public class MapsAllViewFragment extends Fragment {
 
                     placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
                         Place place = response.getPlace();
-                        Log.d("MAP", "Place found: " + place.getDisplayName());
                         LatLng latLng = place.getLocation();
-                        Log.d("MAP", "Lat: " + latLng.latitude + " Long: " + latLng.longitude);
 
                         // If radius searching, and location known (could be null even w/ perms)
                         if(radiusRequest && lastKnownLocation != null) {
 
                             double distance = haversine_distance(lastKnownLocation, place);
-                            Log.d("MAP",
-                                    "Distance: " + distance);
 
                             // Only add marker if w/i SEARCH_RADIUS
                             if (distance < SEARCH_RADIUS) {
@@ -203,15 +182,12 @@ public class MapsAllViewFragment extends Fragment {
                         Log.e("MAP", "Place not found: " + exception.getMessage());
                     });
                 } catch (Exception e) {
-                    Log.d("MAP", "No entry at position: " + i + " - " + e);
+                    Log.e("MAP", "No entry at position: " + i + " - " + e);
                 }
 
             }
         }
     }
-
-    // https://developers.google.com/maps/documentation/javascript/examples/control-custom#maps_control_custom-javascript
-    // ^ for the button that on-click sends populateMap(true) :)
 
     // https://developers.google.com/maps/documentation/android-sdk/current-place-tutorial
     // Enables ui button for resetting camera to current location (if location permissions enabled)
@@ -259,7 +235,6 @@ public class MapsAllViewFragment extends Fragment {
 
                             }
                         } else {
-                            Log.d("MAP", "Current location is null. Using defaults.");
                             Log.e("MAP", "Exception: %s", task.getException());
                             map.moveCamera(CameraUpdateFactory
                                     .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
@@ -268,8 +243,7 @@ public class MapsAllViewFragment extends Fragment {
                     }
                 });
             } else {
-                // Just set the default camera location
-                Log.d("MAP", "Location permissions not granted. Using defaults.");
+                // Just set the default camera location if no permissions
                 map.moveCamera(CameraUpdateFactory
                         .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                 map.getUiSettings().setMyLocationButtonEnabled(false);

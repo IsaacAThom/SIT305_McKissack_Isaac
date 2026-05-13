@@ -93,8 +93,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
     private String[] likelyPlaceIds;
     private String[] likelyPlaceNames;
     private String[] likelyPlaceAddresses;
-    private List[] likelyPlaceAttributions;
-
     private String[] likelyPlaceSearchDisplay;
 
     final List<Place.Field> placeFields =
@@ -210,6 +208,7 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
             public void onPlaceSelected(@NonNull Place place) {
                 Log.i("AUTOCOMPLETE", "Place: " +  place.getDisplayName() + ", " + place.getId());
                 selectedPlace = place;
+                selectedLocation.setText(selectedPlace.getDisplayName());
             }
 
             @Override
@@ -228,16 +227,10 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
             @SuppressLint("MissingPermission")
             @Override
             public void onClick(View v) {
-                Log.d("LOCATION", "Location button clicked");
                 // Checks permissions
                 if(mainActivity.getLocationPermissions()) {
-                    Log.d("LOCATION", "Locations good to go");
                     showCurrentPlace();
                 }
-                else {
-                    Log.d("LOCATION", "Uhoh!");
-                }
-
             }
         });
 
@@ -299,9 +292,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
 
                     Toast.makeText(thisFragmentView.getContext(), "Advert Added",
                             Toast.LENGTH_LONG).show();
-
-                    Log.d("NEW ADVERT",
-                            "Advert Added: " + newAdvert.advertPlaceID);
                 }
             }
         });
@@ -373,8 +363,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
         FindCurrentPlaceRequest request =
                 FindCurrentPlaceRequest.newInstance(placeFields);
 
-        Log.d("LOCATION", request.toString());
-
         @SuppressWarnings("MissingPermission")
         Task<FindCurrentPlaceResponse> placeResult = placesClient.findCurrentPlace(request);
         placeResult.addOnCompleteListener(new OnCompleteListener<FindCurrentPlaceResponse>() {
@@ -382,7 +370,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
             public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
                     FindCurrentPlaceResponse likelyPlaces = task.getResult();
-                    Log.d("LOCATION", likelyPlaces.toString());
                     // Set the count, handling cases where less than 5 entries are returned.
                     int count;
                     if (likelyPlaces.getPlaceLikelihoods().size() < M_MAX_ENTRIES) {
@@ -396,7 +383,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                     likelyPlaceIds = new String[count];
                     likelyPlaceNames = new String[count];
                     likelyPlaceAddresses = new String[count];
-                    likelyPlaceAttributions = new List[count];
                     likelyPlaceSearchDisplay = new String[count];
 
                     for (PlaceLikelihood placeLikelihood : likelyPlaces.getPlaceLikelihoods()) {
@@ -408,8 +394,6 @@ public class NewAdvertFragment extends Fragment implements AdapterView.OnItemSel
                         // String[] formatted for displaying the options
                         likelyPlaceSearchDisplay[i] =
                                 likelyPlaceNames[i] + "\n" + likelyPlaceAddresses [i];
-                        Log.d("LOCATION",
-                                i + likelyPlaceIds[i] + " " + likelyPlaceNames[i] + " " + likelyPlaceAddresses[i]);
                         i++;
                         if (i > (count - 1)) {
                             break;
